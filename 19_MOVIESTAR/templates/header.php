@@ -1,8 +1,27 @@
 <?php
-    include_once("globals.php");
-    include_once("db.php");
+    require_once("globals.php");
+    require_once("db.php");
+    require_once("models/Message.php");
+    require_once("dao/UserDAO.php");
 
-    $flassMenssage = [];
+    
+    $message = new Message("index.php");
+
+    $flassMenssage = $message->getMessage();
+
+    if(!empty($flassMenssage["msg"])){
+        //Limpar a mensagem
+        $message->clearMessage();
+    }
+
+
+    $userDao = new UserDAO($conn, "header.php");
+
+    $userData = $userDao->verifyToken(false);
+
+    
+
+    
 
 ?>
 
@@ -41,16 +60,33 @@
 
             <div class="collapse navbar-collapse" id="navbar">
                 <ul class="navbar-nav">
+                    <?php if($userData):?>
+                        <li class="nav-item">
+                        <a href="newmovie.php" class="nav-link">
+                            <i class="far fa-plus-square"></i> Incluir filme
+                        </a>
+                    </li>
                     <li class="nav-item">
+                        <a href="dashboard.php" class="nav-link">Meus filmes</a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="editprofile.php" class="nav-link"><?= $userData->name?></a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="logout.php" class="nav-link">Sair</a>
+                    </li>
+                    <?php else: ?>
+                        <li class="nav-item">
                         <a href="auth.php" class="nav-link">Entrar / Cadastrar</a>
                     </li>
+                    <?php endif; ?>
 
                 </ul>
             </div>
 
         </nav>
     </header>
-<?php if(!empty($flassMenssage["msg"])):?>
+    <?php if(!empty($flassMenssage["msg"])):?>
     <div class="msg-container">
         <p class="msg <?=$flassMenssage['type']?>"><?=$flassMenssage['msg']?></p>
     </div>
